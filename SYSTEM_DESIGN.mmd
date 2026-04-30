@@ -1,0 +1,111 @@
+%% Serve API - System Design
+%% Render this file with any Mermaid-compatible viewer.
+
+flowchart TD
+    %% External clients
+    subgraph Clients["Clients"]
+        mobile["Mobile App<br/>(React Native / Expo)"]
+        leader["Leader Dashboard<br/>(Future)"]
+    end
+
+    %% Backend boundary
+    subgraph Backend["Serve API - Spring Boot"]
+        rest["REST Controllers"]
+        validation["Request Validation"]
+        services["Application Services<br/>(business rules)"]
+        repositories["Spring Data JPA<br/>Repositories"]
+        flyway["Flyway Migrations"]
+    end
+
+    %% Data boundary
+    subgraph Data["Persistence"]
+        postgres[("PostgreSQL<br/>(Supabase)")]
+    end
+
+    %% Domain model
+    subgraph Domain["Core Domain"]
+        user["User<br/>id, name, email, role"]
+        event["Event<br/>id, title, description, location, status"]
+        eventDate["EventDate<br/>id, eventId, date, startTime, endTime"]
+        volunteerRole["VolunteerRole<br/>id, eventId, name, requiredPeople"]
+        signup["VolunteerSignup<br/>id, userId, roleId, eventDateId, status"]
+    end
+
+    %% Initial API surface
+    subgraph ApiSurface["Initial REST API"]
+        eventsApi["Events<br/>POST /events<br/>GET /events<br/>GET /events/{id}"]
+        datesApi["Event Dates<br/>POST /events/{id}/dates"]
+        rolesApi["Roles<br/>POST /events/{id}/roles"]
+        signupsApi["Volunteer Signups<br/>POST /events/{id}/signups<br/>GET /users/{id}/signups"]
+    end
+
+    %% MVP workflow
+    subgraph Flow["MVP Flow"]
+        createEvent["Leader creates event"]
+        defineDates["Define event dates"]
+        defineRoles["Define volunteer roles"]
+        browseEvents["Volunteers browse events"]
+        selectSlot["Select role and date"]
+        createSignup["Signup is created"]
+        dashboardUpdate["Leader view updates"]
+    end
+
+    %% Architecture flow
+    mobile --> rest
+    leader -. future .-> rest
+    rest --> validation --> services --> repositories --> postgres
+    flyway --> postgres
+
+    %% API to application mapping
+    eventsApi --> rest
+    datesApi --> rest
+    rolesApi --> rest
+    signupsApi --> rest
+
+    %% Domain relationships
+    event -->|has many| eventDate
+    event -->|defines many| volunteerRole
+    user -->|participates through| signup
+    volunteerRole -->|assigned through| signup
+    eventDate -->|scheduled through| signup
+
+    %% Workflow ordering
+    createEvent --> defineDates --> defineRoles --> browseEvents
+    browseEvents --> selectSlot --> createSignup --> dashboardUpdate
+
+    %% Workflow to system touchpoints
+    createEvent -. uses .-> eventsApi
+    defineDates -. uses .-> datesApi
+    defineRoles -. uses .-> rolesApi
+    createSignup -. uses .-> signupsApi
+
+    %% Future capabilities
+    subgraph Future["Future Extensions"]
+        auth["JWT Authentication<br/>Role-based access"]
+        notifications["Notifications<br/>(async processing)"]
+        redis["Redis Cache"]
+        payments["Ticket sales<br/>Payments<br/>Reports"]
+        scale["Horizontal API scaling"]
+    end
+
+    auth -. secures .-> rest
+    notifications -. publishes from .-> services
+    redis -. caches .-> services
+    payments -. extends .-> services
+    scale -. adds API instances .-> rest
+
+    classDef client fill:#e8f3ff,stroke:#2563eb,color:#172554
+    classDef backend fill:#f0fdf4,stroke:#16a34a,color:#14532d
+    classDef data fill:#fff7ed,stroke:#ea580c,color:#7c2d12
+    classDef domain fill:#f8fafc,stroke:#64748b,color:#0f172a
+    classDef api fill:#fefce8,stroke:#ca8a04,color:#713f12
+    classDef flow fill:#f5f3ff,stroke:#7c3aed,color:#2e1065
+    classDef future fill:#fdf2f8,stroke:#db2777,color:#831843
+
+    class mobile,leader client
+    class rest,validation,services,repositories,flyway backend
+    class postgres data
+    class user,event,eventDate,volunteerRole,signup domain
+    class eventsApi,datesApi,rolesApi,signupsApi api
+    class createEvent,defineDates,defineRoles,browseEvents,selectSlot,createSignup,dashboardUpdate flow
+    class auth,notifications,redis,payments,scale future
