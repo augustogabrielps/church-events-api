@@ -2,6 +2,8 @@ package com.serve.repository;
 
 import com.serve.domain.TicketType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,4 +11,11 @@ import java.util.UUID;
 public interface TicketTypeRepository extends JpaRepository<TicketType, UUID> {
 
     List<TicketType> findByEvent_Id(UUID eventId);
+
+    @Query("""
+            select coalesce(sum(ticketType.availableQuantity), 0)
+            from TicketType ticketType
+            where ticketType.event.id = :eventId
+            """)
+    int sumAvailableQuantityByEventId(@Param("eventId") UUID eventId);
 }

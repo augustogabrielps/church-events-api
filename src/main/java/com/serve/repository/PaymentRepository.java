@@ -24,4 +24,16 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
             @Param("saleId") UUID saleId,
             @Param("status") PaymentStatus status
     );
+
+    @Query("""
+            select coalesce(sum(payment.amount), 0)
+            from Payment payment
+            where payment.sale.event.id = :eventId
+              and payment.sale.status <> com.serve.domain.TicketSaleStatus.CANCELLED
+              and payment.status = :status
+            """)
+    BigDecimal sumPaymentsByEventIdAndStatus(
+            @Param("eventId") UUID eventId,
+            @Param("status") PaymentStatus status
+    );
 }
