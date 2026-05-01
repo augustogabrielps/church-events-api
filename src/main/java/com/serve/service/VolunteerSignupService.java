@@ -1,6 +1,7 @@
 package com.serve.service;
 
 import com.serve.domain.EventDate;
+import com.serve.domain.EventStatus;
 import com.serve.domain.SignupStatus;
 import com.serve.domain.User;
 import com.serve.domain.VolunteerRole;
@@ -59,6 +60,10 @@ public class VolunteerSignupService {
 
         if (!role.getEvent().getId().equals(eventDate.getEvent().getId())) {
             throw new BusinessRuleException("Role and event date must belong to the same event");
+        }
+
+        if (role.getEvent().getStatus() != EventStatus.OPEN) {
+            throw new BusinessRuleException("Signups are not allowed for this event");
         }
 
         validateRoleCapacity(role, eventDate);
