@@ -25,5 +25,12 @@ public class Event {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @PrePersist
+    void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
+
     // Getters and Setters
 }

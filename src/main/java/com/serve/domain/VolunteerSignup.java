@@ -1,11 +1,14 @@
 package com.serve.domain;
 
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "volunteer_signups")
+@Data
 public class VolunteerSignup {
 
     @Id
@@ -29,6 +32,13 @@ public class VolunteerSignup {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 
     // Getters and Setters
 }
