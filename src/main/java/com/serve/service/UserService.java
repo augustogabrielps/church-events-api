@@ -1,6 +1,7 @@
 package com.serve.service;
 
 import com.serve.domain.User;
+import com.serve.exception.ResourceConflictException;
 import com.serve.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,10 @@ public class UserService {
 
     @Transactional
     public User createUser(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new ResourceConflictException("User email already exists");
+        }
+
         return userRepository.save(user);
     }
 

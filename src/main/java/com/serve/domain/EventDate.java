@@ -1,12 +1,17 @@
 package com.serve.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "event_dates")
+@Getter
+@Setter
 public class EventDate {
 
     @Id
@@ -26,5 +31,4 @@ public class EventDate {
     @Column(name = "end_time")
     private LocalTime endTime;
 
-    // Getters and Setters
 }
