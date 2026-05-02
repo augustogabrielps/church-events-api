@@ -2,6 +2,7 @@ package com.serve.service;
 
 import com.serve.domain.Event;
 import com.serve.domain.EventStatus;
+import com.serve.dto.UpdateEventRequest;
 import com.serve.repository.EventRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,32 @@ public class EventService {
 
     public List<Event> getAllEvents() {
         return eventRepository.findAll();
+    }
+
+    @Transactional
+    public Event updateEvent(UUID eventId, UpdateEventRequest request) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found"));
+
+        if (request.title() != null) {
+            event.setTitle(request.title());
+        }
+        if (request.description() != null) {
+            event.setDescription(request.description());
+        }
+        if (request.location() != null) {
+            event.setLocation(request.location());
+        }
+
+        return eventRepository.save(event);
+    }
+
+    @Transactional
+    public void deleteEvent(UUID eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found"));
+
+        eventRepository.delete(event);
     }
 
     @Transactional
