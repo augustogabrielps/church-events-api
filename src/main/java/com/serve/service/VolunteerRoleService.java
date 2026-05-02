@@ -58,7 +58,23 @@ public class VolunteerRoleService {
         Volunteer volunteer = volunteerRepository.findById(volunteerId)
                 .orElseThrow(() -> new EntityNotFoundException("Volunteer not found"));
 
-        role.setAssignedVolunteer(volunteer);
+        boolean alreadyAssigned = role.getVolunteers().stream()
+                .anyMatch(assignedVolunteer -> assignedVolunteer.getId().equals(volunteerId));
+
+        if (!alreadyAssigned) {
+            role.getVolunteers().add(volunteer);
+        }
+
+        return volunteerRoleRepository.save(role);
+    }
+
+    public VolunteerRole unassignVolunteer(UUID roleId, UUID volunteerId) {
+        VolunteerRole role = volunteerRoleRepository.findById(roleId)
+                .orElseThrow(() -> new EntityNotFoundException("Role not found"));
+        Volunteer volunteer = volunteerRepository.findById(volunteerId)
+                .orElseThrow(() -> new EntityNotFoundException("Volunteer not found"));
+
+        role.getVolunteers().removeIf(assignedVolunteer -> assignedVolunteer.getId().equals(volunteer.getId()));
 
         return volunteerRoleRepository.save(role);
     }

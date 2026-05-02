@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -28,8 +30,12 @@ public class VolunteerRole {
     @Column(name = "required_people", nullable = false)
     private Integer requiredPeople;
 
-    @ManyToOne
-    @JoinColumn(name = "volunteer_id")
-    private Volunteer assignedVolunteer;
+    @ManyToMany
+    @JoinTable(
+            name = "volunteer_role_assignments",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "volunteer_id")
+    )
+    private List<Volunteer> volunteers = new ArrayList<>();
 
 }

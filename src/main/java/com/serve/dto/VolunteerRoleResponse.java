@@ -2,6 +2,7 @@ package com.serve.dto;
 
 import com.serve.domain.VolunteerRole;
 
+import java.util.List;
 import java.util.UUID;
 
 public record VolunteerRoleResponse(
@@ -10,7 +11,7 @@ public record VolunteerRoleResponse(
         String name,
         String description,
         Integer requiredPeople,
-        VolunteerResponse assignedVolunteer
+        List<VolunteerResponse> volunteers
 ) {
 
     public static VolunteerRoleResponse from(VolunteerRole role) {
@@ -20,7 +21,9 @@ public record VolunteerRoleResponse(
                 role.getName(),
                 role.getDescription(),
                 role.getRequiredPeople(),
-                VolunteerResponse.from(role.getAssignedVolunteer())
+                role.getVolunteers().stream()
+                        .map(VolunteerResponse::from)
+                        .toList()
         );
     }
 }

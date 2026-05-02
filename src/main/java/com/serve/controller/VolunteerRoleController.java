@@ -6,6 +6,7 @@ import com.serve.dto.VolunteerRoleResponse;
 import com.serve.service.VolunteerRoleService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,5 +57,13 @@ public class VolunteerRoleController {
             @PathVariable UUID volunteerId
     ) {
         return VolunteerRoleResponse.from(volunteerRoleService.assignVolunteer(roleId, volunteerId));
+    }
+
+    @DeleteMapping("/roles/{roleId}/assign/{volunteerId}")
+    public VolunteerRoleResponse unassignVolunteer(
+            @PathVariable UUID roleId,
+            @PathVariable UUID volunteerId
+    ) {
+        return VolunteerRoleResponse.from(volunteerRoleService.unassignVolunteer(roleId, volunteerId));
     }
 }
