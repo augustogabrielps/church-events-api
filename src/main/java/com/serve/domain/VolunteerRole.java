@@ -28,4 +28,8 @@ public class VolunteerRole {
     @Column(name = "required_people", nullable = false)
     private Integer requiredPeople;
 
+    @ManyToOne
+    @JoinColumn(name = "volunteer_id")
+    private Volunteer assignedVolunteer;
+
 }

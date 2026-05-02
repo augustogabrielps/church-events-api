@@ -9,7 +9,8 @@ public record VolunteerRoleResponse(
         UUID eventId,
         String name,
         String description,
-        Integer requiredPeople
+        Integer requiredPeople,
+        VolunteerResponse assignedVolunteer
 ) {
 
     public static VolunteerRoleResponse from(VolunteerRole role) {
@@ -18,7 +19,8 @@ public record VolunteerRoleResponse(
                 role.getEvent().getId(),
                 role.getName(),
                 role.getDescription(),
-                role.getRequiredPeople()
+                role.getRequiredPeople(),
+                VolunteerResponse.from(role.getAssignedVolunteer())
         );
     }
 }
